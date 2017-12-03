@@ -27,6 +27,7 @@
     (define-key map (kbd "C-c ]") #'ia-increment-group)
     (define-key map (kbd "C-c g") #'ia-set-group)
     (define-key map (kbd "C-c s") #'ia-set-spacing)
+    (define-key map (kbd "C-c C-c") #'ia-commit)
     map)
   "Keymap used in minibuffer during `ia-interactive-align'."
   :group 'interactive-align)
@@ -134,6 +135,15 @@ This should be called with a numeric prefix argument."
   (when (ia--active-p)
     (setq ia--spacing spacing)
     (ia--update)))
+
+(defun ia-commit ()
+  "Commit current regexp."
+  (interactive)
+  (when (ia--active-p)
+    (ia--with-region-narrowed
+     (setq ia--aligned-string (buffer-substring (point-min) (point-max)))
+     (ia--update)
+     (minibuffer-message "Commited regexp %s" ia--regexp))))
 
 (defun ia--make-marker (location)
   "Make marker at LOCATION."
