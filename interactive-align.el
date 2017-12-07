@@ -55,6 +55,8 @@
 (defvar ia--spacing nil)
 (defvar ia--repeat nil)
 (defvar ia--regexp nil)
+(defvar ia--history nil)
+(defvar ia--error nil)
 
 (defmacro ia--with-region-narrowed (&rest forms)
   "Evaluate FORMS in `ia--buffer'.
@@ -196,8 +198,17 @@ This should be called with a numeric prefix argument."
 (defun ia--after-change (beg end len)
   (when (and (ia--active-p) (minibufferp))
     (condition-case err
-	(ia--update)
-      (error (minibuffer-message (error-message-string err))))))
+	(progn
+	  (ia--update)
+	  (setq ia--error nil))
+      (error
+       (progn
+	 (setq ia--error err)
+	 (run-with-timer
+	  0.05 nil
+	  (lambda ()
+	    (when ia--error
+	      (minibuffer-message (error-message-string ia--error))))))))))
 
 ;;;###autoload
 (defun ia-interactive-align (from to)
@@ -218,7 +229,8 @@ This should be called with a numeric prefix argument."
 	    (add-hook 'after-change-functions #'ia--after-change)
 	    (evil-with-single-undo
 	      (atomic-change-group
-		(read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap))))
+		(read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap
+				      nil 'ia--history))))
 	(set-marker ia--start nil)
 	(set-marker ia--end nil)))))
 
