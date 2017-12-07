@@ -3,7 +3,7 @@
 ;;
 ;; Author: Michał Kondraciuk <k.michal@zoho.com>
 ;; URL: https://github.com/mkcms/interactive-align
-;; Package-Requires: ((emacs "24.4"))
+;; Package-Requires: ((emacs "24.4") (evil "1.2.0"))
 ;; Version: 0.0.1
 ;; Keywords: tools, editing, align, interactive
 
@@ -12,6 +12,7 @@
 ;; TODO: Write project summary.
 
 (require 'align)
+(require 'evil)
 
 (defgroup interactive-align nil
   "Interactive align-regexp."
@@ -211,15 +212,13 @@ This should be called with a numeric prefix argument."
 	  (ia--group 1)
 	  (ia--spacing ia-default-spacing)
 	  (ia--tabs ia-align-with-tabs)
-	  (ia--regexp nil)
-	  success)
+	  (ia--regexp nil))
       (unwind-protect
 	  (progn
 	    (add-hook 'after-change-functions #'ia--after-change)
-	    (read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap)
-	    (setq success t))
-	(unless success
-	  (ia--revert))
+	    (evil-with-single-undo
+	      (atomic-change-group
+		(read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap))))
 	(set-marker ia--start nil)
 	(set-marker ia--end nil)))))
 
