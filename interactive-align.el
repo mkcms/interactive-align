@@ -28,7 +28,8 @@
     (define-key map (kbd "C-c ]") #'ia-increment-group)
     (define-key map (kbd "C-c g") #'ia-set-group)
     (define-key map (kbd "C-c s") #'ia-set-spacing)
-    (define-key map (kbd "C-c C-c") #'ia-commit)
+    (define-key map (kbd "C-c RET") #'ia-commit)
+    (define-key map (kbd "C-c C-c") #'ia-update)
     map)
   "Keymap used in minibuffer during `ia-interactive-align'."
   :group 'interactive-align)
@@ -45,6 +46,18 @@
 		 (const :tag "Always use tabs" t)
 		 (const :tag "Use value of variable `indent-tabs-mode'"
 			indent-tabs-mode)))
+
+(defcustom ia-auto-update t
+  "A value that says when to align the region as the characters are typed.
+If it is nil, never update (you can manually update with `ia-update').
+If it is t, always update.
+If it is an integer, update if the number of lines in the region is less than
+or equal to this, otherwise do not update."
+  :group 'interactive-align
+  :type
+  '(choice (const :tag "Never update" nil)
+	   (const :tag "Always update" t)
+	   (integer :tag "Update if number of lines is less than or equal")))
 
 (defvar ia--buffer nil)
 (defvar ia--start nil)
@@ -83,14 +96,14 @@ the line."
   (interactive)
   (when (ia--active-p)
     (setq ia--repeat (not ia--repeat))
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-toggle-tabs ()
   "Toggle tab usage during alignment."
   (interactive)
   (when (ia--active-p)
     (setq ia--tabs (not ia--tabs))
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-increment-group ()
   "Increment the parenthesis group to modify.
@@ -112,7 +125,7 @@ the group number to set."
   (or group (setq group 1))
   (when (ia--active-p)
     (setq ia--group group)
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-increment-spacing ()
   "Increment the amount of spacing.
@@ -120,7 +133,7 @@ Use `ia-set-spacing' to set the spacing to specific number."
   (interactive)
   (when (ia--active-p)
     (setq ia--spacing (1+ ia--spacing))
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-decrement-spacing ()
   "Decrement the amount of spacing.
@@ -128,7 +141,7 @@ Use `ia-set-spacing' to set the spacing to specific number."
   (interactive)
   (when (ia--active-p)
     (setq ia--spacing (1- ia--spacing))
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-set-spacing (spacing)
   "Set the spacing to SPACING.
@@ -137,7 +150,7 @@ This should be called with a numeric prefix argument."
   (or spacing (setq spacing 1))
   (when (ia--active-p)
     (setq ia--spacing spacing)
-    (ia--update)))
+    (ia-update)))
 
 (defun ia-commit ()
   "Commit current regexp."
@@ -145,7 +158,7 @@ This should be called with a numeric prefix argument."
   (when (ia--active-p)
     (ia--with-region-narrowed
      (setq ia--aligned-string (buffer-substring (point-min) (point-max)))
-     (ia--update)
+     (ia-update)
      (minibuffer-message "Commited regexp %s" ia--regexp))))
 
 (defun ia--make-marker (location)
@@ -168,16 +181,24 @@ This should be called with a numeric prefix argument."
 	indent-tabs-mode)
     ia--tabs))
 
+(defun ia--autoupdate-p ()
+  (if (integerp ia-auto-update)
+      (ia--with-region-narrowed
+       (<= (- (line-number-at-pos (point-max)) (line-number-at-pos (point-min)))
+	  ia-auto-update))
+    ia-auto-update))
+
 (defun ia--update-minibuffer-prompt ()
   (let ((inhibit-read-only t)
-	(prompt (format "Align regexp (group %s%s, spacing %s%s, %s): "
-			ia--group (if (< ia--group 0) " (justify)" "")
-			ia--spacing (if ia--repeat ", repeat" "")
+	(prompt (format "Align regexp %s(group %s%s, spacing %s%s, %s): "
+			(if (ia--autoupdate-p) "" "(manual) ") ia--group
+			(if (< ia--group 0) " (justify)" "") ia--spacing
+			(if ia--repeat ", repeat" "")
 			(if (ia--enable-tabs-p) "with tabs" "no tabs"))))
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
 
 (defun ia--minibuffer-setup-hook ()
-  (and (ia--active-p) (ia--update)))
+  (and (ia--active-p) (ia-update)))
 (add-hook 'minibuffer-setup-hook #'ia--minibuffer-setup-hook)
 
 (defun ia--align ()
@@ -186,20 +207,22 @@ This should be called with a numeric prefix argument."
    (align-regexp (point-min) (point-max) ia--regexp
 		 ia--group ia--spacing ia--repeat)))
 
-(defun ia--update ()
+(defun ia-update ()
+  (interactive)
   (when (and (ia--active-p) (minibufferp))
     (ia--update-minibuffer-prompt)
-    (let ((regexp (minibuffer-contents-no-properties))
-	  (indent-tabs-mode (ia--enable-tabs-p)))
-      (setq ia--regexp regexp)
-      (ia--align)
-      (redisplay))))
+    (when (or (called-interactively-p) (ia--autoupdate-p))
+      (let ((regexp (minibuffer-contents-no-properties))
+	    (indent-tabs-mode (ia--enable-tabs-p)))
+	(setq ia--regexp regexp)
+	(ia--align)
+	(redisplay)))))
 
 (defun ia--after-change (beg end len)
   (when (and (ia--active-p) (minibufferp))
     (condition-case err
 	(progn
-	  (ia--update)
+	  (ia-update)
 	  (setq ia--error nil))
       (error
        (progn
