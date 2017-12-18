@@ -211,7 +211,7 @@ This should be called with a numeric prefix argument."
   (interactive)
   (when (and (ia--active-p) (minibufferp))
     (ia--update-minibuffer-prompt)
-    (when (or (called-interactively-p) (ia--autoupdate-p))
+    (when (or (called-interactively-p 'interactive) (ia--autoupdate-p))
       (let ((regexp (minibuffer-contents-no-properties))
 	    (indent-tabs-mode (ia--enable-tabs-p)))
 	(setq ia--regexp regexp)
