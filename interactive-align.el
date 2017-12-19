@@ -255,14 +255,14 @@ Use `ia-commit' to actually align the region in the buffer."
 	      (minibuffer-message (error-message-string ia--error))))))))))
 
 ;;;###autoload
-(defun ia-interactive-align (from to)
+(defun ia-interactive-align (beg end)
   (interactive "r")
   (if (ia--active-p)
       (error "Already aligning")
     (let ((ia--buffer (current-buffer))
-	  (ia--start (ia--make-marker from))
-	  (ia--end (ia--make-marker to))
-	  (ia--region-contents (buffer-substring from to))
+	  (ia--start (ia--make-marker beg))
+	  (ia--end (ia--make-marker end))
+	  (ia--region-contents (buffer-substring beg end))
 	  (ia--repeat nil)
 	  (ia--group 1)
 	  (ia--spacing ia-default-spacing)
