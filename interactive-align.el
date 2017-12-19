@@ -184,7 +184,8 @@ This should be called with a numeric prefix argument."
 (defun ia--autoupdate-p ()
   (if (integerp ia-auto-update)
       (ia--with-region-narrowed
-       (<= (- (line-number-at-pos (point-max)) (line-number-at-pos (point-min)))
+       (<= (- (line-number-at-pos (point-max))
+	      (line-number-at-pos (point-min)))
 	  ia-auto-update))
     ia-auto-update))
 
