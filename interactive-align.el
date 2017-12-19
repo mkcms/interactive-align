@@ -40,7 +40,11 @@
   :type 'integer)
 
 (defcustom ia-align-with-tabs nil
-  "TODO: Document ia-align-with-tabs."
+  "A value that says when the region should be aligned with tabs.
+If it's nil, never use tabs.
+If it's t, always use tabs.
+If it's the symbol 'indent-tabs-mode, use value of variable
+`indent-tabs-mode.'"
   :group 'interactive-align
   :type '(choice (const :tag "Never use tabs" nil)
 		 (const :tag "Always use tabs" t)
@@ -86,41 +90,48 @@ The buffer is narrowed to region that is to be aligned."
 	   (set-marker ia--end (point-max)))))))
 
 (defun ia--active-p ()
-  "Return non-nil if currently doing interactive align."
+  "Return non-nil if currently executing `ia-interactive-align'."
   ia--buffer)
 
 (defun ia-toggle-repeat ()
   "Toggle 'repeat' argument passed to `align-regexp'.
-When the repeat argument is t, the alignment is repeated throughout
-the line."
+When the repeat argument is non-nil, the alignment is repeated throughout
+the line.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (when (ia--active-p)
     (setq ia--repeat (not ia--repeat))
     (ia-update)))
 
 (defun ia-toggle-tabs ()
-  "Toggle tab usage during alignment."
+  "Toggle tab usage during alignment.
+After executing this command, the region is always aligned with either tabs
+or spaces, regardless of value of the variable `ia-align-with-tabs'.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (when (ia--active-p)
     (setq ia--tabs (not ia--tabs))
     (ia-update)))
 
 (defun ia-increment-group ()
-  "Increment the parenthesis group to modify.
-Use `ia-set-group' to set the group to a specific number."
+  "Increment the parenthesis group argument passed to `align-regexp'.
+Use `ia-set-group' to set the group to a specific number.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (ia-set-group (1+ ia--group)))
 
 (defun ia-decrement-group ()
-  "Decrement the parenthesis group to modify.
-Use `ia-set-group' to set the group to a specific number."
+  "Decrement the parenthesis group argument passed to `align-regexp'.
+Use `ia-set-group' to set the group to a specific number.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (ia-set-group (1- ia--group)))
 
 (defun ia-set-group (group)
-  "Set the parenthesis group to modify to GROUP.
+  "Set the parenthesis group argument for the `align-regexp' command to GROUP.
 This should be called with a numeric prefix argument that is
-the group number to set."
+the group number to set.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive "p")
   (or group (setq group 1))
   (when (ia--active-p)
@@ -128,24 +139,27 @@ the group number to set."
     (ia-update)))
 
 (defun ia-increment-spacing ()
-  "Increment the amount of spacing.
-Use `ia-set-spacing' to set the spacing to specific number."
+  "Increment the amount of spacing passed to `align-regexp' command.
+Use `ia-set-spacing' to set the spacing to specific number.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (when (ia--active-p)
     (setq ia--spacing (1+ ia--spacing))
     (ia-update)))
 
 (defun ia-decrement-spacing ()
-  "Decrement the amount of spacing.
-Use `ia-set-spacing' to set the spacing to specific number."
+  "Decrement the amount of spacing passed to `align-regexp' command.
+Use `ia-set-spacing' to set the spacing to specific number.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (when (ia--active-p)
     (setq ia--spacing (1- ia--spacing))
     (ia-update)))
 
 (defun ia-set-spacing (spacing)
-  "Set the spacing to SPACING.
-This should be called with a numeric prefix argument."
+  "Set the spacing parameter passed to `align-regexp' command to SPACING.
+This should be called with a numeric prefix argument.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive "p")
   (or spacing (setq spacing 1))
   (when (ia--active-p)
@@ -153,7 +167,10 @@ This should be called with a numeric prefix argument."
     (ia-update)))
 
 (defun ia-commit ()
-  "Commit current regexp."
+  "Align the region using the current regexp and commit change in the buffer.
+The region is aligned using the current regexp only if it's valid.
+Next alignments will use the newly aligned region.
+Does nothing when currently not aligning with `ia-interactive-align'."
   (interactive)
   (when (ia--active-p)
     (ia--with-region-narrowed
@@ -209,6 +226,9 @@ This should be called with a numeric prefix argument."
 		 ia--group ia--spacing ia--repeat)))
 
 (defun ia-update ()
+  "Align the region with regexp in the minibuffer for preview.
+Does temporary alignment for preview only.
+Use `ia-commit' to actually align the region in the buffer."
   (interactive)
   (when (and (ia--active-p) (minibufferp))
     (ia--update-minibuffer-prompt)
