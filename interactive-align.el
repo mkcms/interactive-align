@@ -157,8 +157,8 @@ This should be called with a numeric prefix argument."
   (interactive)
   (when (ia--active-p)
     (ia--with-region-narrowed
-     (setq ia--region-contents (buffer-substring (point-min) (point-max)))
      (ia-update)
+     (setq ia--region-contents (buffer-substring (point-min) (point-max)))
      (minibuffer-message "Commited regexp %s" ia--regexp))))
 
 (defun ia--make-marker (location)
