@@ -256,7 +256,7 @@ Use `ia-commit' to actually align the region in the buffer."
 
 ;;;###autoload
 (defun ia-interactive-align (from to)
-  (interactive (list (region-beginning) (region-end)))
+  (interactive "r")
   (if (ia--active-p)
       (error "Already aligning")
     (let ((ia--buffer (current-buffer))
