@@ -306,10 +306,12 @@ The keymap used in minibuffer is `ia-minibuffer-keymap':
 	      (read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap
 				    nil 'ia--history)
 	      (setq success t)))
-	(when success
-	  (push (cons region-contents beg) buffer-undo-list)
-	  (push (cons (marker-position ia--start) (marker-position ia--end))
-		buffer-undo-list))
+	(if success
+	    (progn (push (cons region-contents beg) buffer-undo-list)
+		   (push (cons (marker-position ia--start)
+			       (marker-position ia--end))
+			 buffer-undo-list))
+	  (ia--revert))
 	(set-marker ia--start nil)
 	(set-marker ia--end nil)))))
 
