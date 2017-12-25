@@ -3,7 +3,7 @@
 ;;
 ;; Author: Michał Kondraciuk <k.michal@zoho.com>
 ;; URL: https://github.com/mkcms/interactive-align
-;; Package-Requires: ((emacs "24.4") (evil "1.2.0"))
+;; Package-Requires: ((emacs "24.4"))
 ;; Version: 0.0.1
 ;; Keywords: tools, editing, align, interactive
 
@@ -16,7 +16,6 @@
 ;; See documentation for command `ia-interactive-align'.
 
 (require 'align)
-(require 'evil)
 
 ;;; Code:
 
@@ -289,22 +288,28 @@ The keymap used in minibuffer is `ia-minibuffer-keymap':
   (interactive "r")
   (if (ia--active-p)
       (error "Already aligning")
-    (let ((ia--buffer (current-buffer))
-	  (ia--start (ia--make-marker beg))
-	  (ia--end (ia--make-marker end))
-	  (ia--region-contents (buffer-substring beg end))
-	  (ia--repeat nil)
-	  (ia--group 1)
-	  (ia--spacing ia-default-spacing)
-	  (ia--tabs ia-align-with-tabs)
-	  (ia--regexp nil))
+    (let* ((ia--buffer (current-buffer))
+	   (ia--start (ia--make-marker beg))
+	   (ia--end (ia--make-marker end))
+	   (region-contents (buffer-substring beg end))
+	   (ia--region-contents region-contents)
+	   (ia--repeat nil)
+	   (ia--group 1)
+	   (ia--spacing ia-default-spacing)
+	   (ia--tabs ia-align-with-tabs)
+	   (ia--regexp nil)
+	   success)
       (unwind-protect
 	  (progn
 	    (add-hook 'after-change-functions #'ia--after-change)
-	    (evil-with-single-undo
-	      (atomic-change-group
-		(read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap
-				      nil 'ia--history))))
+	    (let ((buffer-undo-list t))
+	      (read-from-minibuffer " " "\\(\\s-+\\)" ia-minibuffer-keymap
+				    nil 'ia--history)
+	      (setq success t)))
+	(when success
+	  (push (cons region-contents beg) buffer-undo-list)
+	  (push (cons (marker-position ia--start) (marker-position ia--end))
+		buffer-undo-list))
 	(set-marker ia--start nil)
 	(set-marker ia--end nil)))))
 
