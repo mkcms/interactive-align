@@ -260,12 +260,13 @@ Updates the minibuffer prompt and maybe realigns the region."
 	  (setq ia--error nil))
       (error
        (progn
-	 (setq ia--error err)
-	 (run-with-timer
-	  0.05 nil
-	  (lambda ()
-	    (when ia--error
-	      (minibuffer-message (error-message-string ia--error))))))))))
+	 (unless ia--error
+	   (setq ia--error err)
+	   (run-with-timer
+	    0.05 nil
+	    (lambda ()
+	      (when ia--error
+		(minibuffer-message (error-message-string ia--error)))))))))))
 
 ;;;###autoload
 (defun ia-interactive-align (beg end)
