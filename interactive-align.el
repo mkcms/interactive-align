@@ -9,7 +9,11 @@
 
 ;;; Commentary:
 ;;
-;; TODO: Write project summary.
+;; This package provides command `ia-interactive-align'
+;; which can be used to interactively align a region
+;; using a regexp read from minibuffer, like `align-regexp'.
+;;
+;; See documentation for command `ia-interactive-align'.
 
 (require 'align)
 (require 'evil)
@@ -256,6 +260,22 @@ Use `ia-commit' to actually align the region in the buffer."
 
 ;;;###autoload
 (defun ia-interactive-align (beg end)
+  "Interactively align region BEG END using regexp read from minibuffer.
+As characters are typed in the minibuffer, the region is aligned
+using `align-regexp' and the result is presented to the user.
+\\<ia-minibuffer-keymap>
+If the custom option `ia-auto-update' is not set to t, manual update is
+possible with command `ia-update' bound to \\[ia-update].
+
+Additional arguments passed to `align-regexp' are displayed in
+the minibuffer prompt and all of them can be interactively
+specified.  The parenthesis group argument can be changed using
+\\[ia-decrement-group], \\[ia-increment-group] and \
+\\[ia-set-group], the spacing can be modified using
+\\[ia-decrement-spacing], \\[ia-increment-spacing] and \\[ia-set-spacing].
+
+The keymap used in minibuffer is `ia-minibuffer-keymap':
+\\{ia-minibuffer-keymap}"
   (interactive "r")
   (if (ia--active-p)
       (error "Already aligning")
