@@ -18,6 +18,8 @@
 (require 'align)
 (require 'evil)
 
+;;; Code:
+
 (defgroup interactive-align nil
   "Interactive align-regexp."
   :group 'align)
@@ -190,11 +192,13 @@ Does nothing when currently not aligning with `ia-interactive-align'."
     marker))
 
 (defun ia--revert ()
+  "Revert the aligned region to original `ia--region-contents'."
   (ia--with-region-narrowed
    (delete-region ia--start ia--end)
    (insert ia--region-contents)))
 
 (defun ia--enable-tabs-p ()
+  "Return non-nil if tabs should be used for aligning current region."
   (unless (ia--active-p)
     (error "Called outside `ia-interactive-align'"))
   (if (eq ia--tabs 'indent-tabs-mode)
@@ -203,6 +207,7 @@ Does nothing when currently not aligning with `ia-interactive-align'."
     ia--tabs))
 
 (defun ia--autoupdate-p ()
+  "Return non-nil if the region should be aligned as characters are typed."
   (if (integerp ia-auto-update)
       (ia--with-region-narrowed
        (<= (- (line-number-at-pos (point-max))
@@ -211,6 +216,7 @@ Does nothing when currently not aligning with `ia-interactive-align'."
     ia-auto-update))
 
 (defun ia--update-minibuffer-prompt ()
+  "Update the minibuffer prompt to show arguments passed to `align-regexp'."
   (let ((inhibit-read-only t)
 	(prompt (format "Align regexp %s(group %s%s, spacing %s%s, %s): "
 			(if (ia--autoupdate-p) "" "(manual) ") ia--group
@@ -220,10 +226,12 @@ Does nothing when currently not aligning with `ia-interactive-align'."
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
 
 (defun ia--minibuffer-setup-hook ()
+  "Function called on minibuffer setup.  Aligns the region."
   (and (ia--active-p) (ia-update)))
 (add-hook 'minibuffer-setup-hook #'ia--minibuffer-setup-hook)
 
 (defun ia--align ()
+  "Revert the current region, then align it."
   (ia--revert)
   (ia--with-region-narrowed
    (align-regexp (point-min) (point-max) ia--regexp
@@ -244,6 +252,8 @@ Use `ia-commit' to actually align the region in the buffer."
 	(redisplay)))))
 
 (defun ia--after-change (beg end len)
+  "Function called after change.
+Updates the minibuffer prompt and maybe realigns the region."
   (when (and (ia--active-p) (minibufferp))
     (condition-case err
 	(progn
