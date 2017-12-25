@@ -25,14 +25,14 @@
 
 (defcustom ia-minibuffer-keymap
   (let ((map (copy-keymap minibuffer-local-map)))
-    (define-key map (kbd "C-c r") #'ia-toggle-repeat)
-    (define-key map (kbd "C-c t") #'ia-toggle-tabs)
+    (define-key map (kbd "C-c C-r") #'ia-toggle-repeat)
+    (define-key map (kbd "C-c C-t") #'ia-toggle-tabs)
     (define-key map (kbd "C-c +") #'ia-increment-spacing)
     (define-key map (kbd "C-c -") #'ia-decrement-spacing)
     (define-key map (kbd "C-c [") #'ia-decrement-group)
     (define-key map (kbd "C-c ]") #'ia-increment-group)
-    (define-key map (kbd "C-c g") #'ia-set-group)
-    (define-key map (kbd "C-c s") #'ia-set-spacing)
+    (define-key map (kbd "C-c C-f") #'ia-set-group)
+    (define-key map (kbd "C-c C-s") #'ia-set-spacing)
     (define-key map (kbd "C-c RET") #'ia-commit)
     (define-key map (kbd "C-c C-c") #'ia-update)
     map)
