@@ -1,69 +1,69 @@
-* interactive-align.el - interactive ~align-regexp~
+* ialign.el - interactive ~align-regexp~
   Emacs package that provides interactive version of ~align-regexp~ command.
 
   [[./demo.gif]]
 * Installation
-  Put path to file ~interactive-align.el~ somewhere in your ~load-path~, then
+  Put path to file ~ialign.el~ somewhere in your ~load-path~, then
   #+BEGIN_SRC emacs-lisp
-(require 'interactive-align)
-(global-set-key (kbd "C-x l") #'ia-interactive-align)
+(require 'ialign)
+(global-set-key (kbd "C-x l") #'ialign-interactive-align)
   #+END_SRC
   You can also bind it to different key (~(kbd "your-key")~).
 * Commands
-** ~(ia-interactive-align BEG END)~
+** ~(ialign-interactive-align BEG END)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
 
    As characters are typed in the minibuffer, the region is aligned
    using ~align-regexp~ and the result is presented to the user.
 
-   In the minibuffer, ~ia-minibuffer-keymap~ is the active keymap.
-** ~(ia-toggle-repeat)~
+   In the minibuffer, ~ialign-minibuffer-keymap~ is the active keymap.
+** ~(ialign-toggle-repeat)~
    Toggle /repeat/ argument passed to ~align-regexp~.
 
    When the repeat argument is non-nil, the alignment is repeated throughout
    the line.
-** ~(ia-toggle-tabs)~
+** ~(ialign-toggle-tabs)~
    Toggle tab usage during alignment.
-** ~(ia-set-group GROUP)~
+** ~(ialign-set-group GROUP)~
    Set the parenthesis group argument for the ~align-regexp~ command to /GROUP/.
 
    This should be called with a numeric prefix argument that is
    the group number to set.
-** ~(ia-increment-group)~, ~(ia-decrement-group)~
+** ~(ialign-increment-group)~, ~(ialign-decrement-group)~
    Increment/decrement the parenthesis group argument passed to ~align-regexp~.
-** ~(ia-set-spacing SPACING)~
+** ~(ialign-set-spacing SPACING)~
    Set the spacing parameter passed to ~align-regexp~ command to /SPACING/.
 
    This should be called with a numeric prefix argument.
-** ~(ia-increment-spacing)~, ~(ia-decrement-spacing)~
+** ~(ialign-increment-spacing)~, ~(ialign-decrement-spacing)~
    Increment/decrement the amount of spacing passed to ~align-regexp~ command.
-** ~(ia-commit)~
+** ~(ialign-commit)~
    Align the region using the current regexp and commit change in the buffer.
 
    The region is aligned using the current regexp only if it's valid.
    Next alignments will use the newly aligned region.
 
 * Options
-** ~ia-minibuffer-keymap~
-   Keymap used in the minibuffer when ~ia-interactive-align~ command is executed.
+** ~ialign-minibuffer-keymap~
+   Keymap used in the minibuffer when ~ialign-interactive-align~ command is executed.
 
-   | Key     | Command              |
-   |---------+----------------------|
-   | C-c C-r | ia-toggle-repeat     |
-   | C-c C-t | ia-toggle-tabs       |
-   | C-c +   | ia-increment-spacing |
-   | C-c -   | ia-decrement-spacing |
-   | C-c [   | ia-decrement-group   |
-   | C-c ]   | ia-increment-group   |
-   | C-c C-f | ia-set-group         |
-   | C-c C-s | ia-set-spacing       |
-   | C-c RET | ia-commit            |
-   | C-c C-c | ia-update            |
-** ~ia-default-spacing~
+   | Key     | Command                  |
+   |---------+--------------------------|
+   | C-c C-r | ialign-toggle-repeat     |
+   | C-c C-t | ialign-toggle-tabs       |
+   | C-c +   | ialign-increment-spacing |
+   | C-c -   | ialign-decrement-spacing |
+   | C-c [   | ialign-decrement-group   |
+   | C-c ]   | ialign-increment-group   |
+   | C-c C-f | ialign-set-group         |
+   | C-c C-s | ialign-set-spacing       |
+   | C-c RET | ialign-commit            |
+   | C-c C-c | ialign-update            |
+** ~ialign-default-spacing~
    An integer that represents the default amount of padding to use.
 
    The default value is the same as ~align-default-spacing~.
-** ~ia-align-with-tabs~
+** ~ialign-align-with-tabs~
    A value that says when the region should be aligned with tabs.
 
    - If it's ~nil~, never use tabs.
@@ -71,10 +71,10 @@
    - If it's the symbol 'indent-tabs-mode, use value of variable ~indent-tabs-mode~.
 
    The dafault value is ~nil~.
-** ~ia-auto-update~
+** ~ialign-auto-update~
    A value that says when to align the region as the characters are typed.
 
-   - If it is ~nil~, never update (you can manually update with `ia-update').
+   - If it is ~nil~, never update (you can manually update with `ialign-update').
    - If it is ~t~, always update.
    - If it is an integer, update if the number of lines in the region is less than or equal to this, otherwise do not update.
 
