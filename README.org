@@ -74,7 +74,7 @@
 ** ~ialign-auto-update~
    A value that says when to align the region as the characters are typed.
 
-   - If it is ~nil~, never update (you can manually update with `ialign-update').
+   - If it is ~nil~, never update (you can manually update with ~ialign-update~).
    - If it is ~t~, always update.
    - If it is an integer, update if the number of lines in the region is less than or equal to this, otherwise do not update.
 

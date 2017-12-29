@@ -64,7 +64,7 @@
 If it's nil, never use tabs.
 If it's t, always use tabs.
 If it's the symbol 'indent-tabs-mode, use value of variable
-`indent-tabs-mode.'"
+`indent-tabs-mode'."
   :group 'ialign
   :type '(choice (const :tag "Never use tabs" nil)
 		 (const :tag "Always use tabs" t)
