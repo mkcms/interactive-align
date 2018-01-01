@@ -1,14 +1,19 @@
+[[https://melpa.org/#/ialign][file:https://melpa.org/packages/ialign-badge.svg]]
+
 * ialign.el - interactive ~align-regexp~
   Emacs package that provides interactive version of ~align-regexp~ command.
 
   [[./demo.gif]]
 * Installation
-  Put path to file ~ialign.el~ somewhere in your ~load-path~, then
-  #+BEGIN_SRC emacs-lisp
+** From melpa
+   This package is available from melpa, just do ~M-x package-install RET ialign RET~.
+** Manual
+   Put path to file ~ialign.el~ somewhere in your ~load-path~, then
+   #+BEGIN_SRC emacs-lisp
 (require 'ialign)
 (global-set-key (kbd "C-x l") #'ialign-interactive-align)
-  #+END_SRC
-  You can also bind it to different key (~(kbd "your-key")~).
+   #+END_SRC
+   You can also bind it to different key (~(kbd "your-key")~).
 * Commands
 ** ~(ialign-interactive-align BEG END)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
