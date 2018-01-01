@@ -4,6 +4,15 @@
   Emacs package that provides interactive version of ~align-regexp~ command.
 
   [[./demo.gif]]
+* Table of contents						   :TOC:
+- [[#ialignel---interactive-align-regexp][ialign.el - interactive ~align-regexp~]]
+- [[#installation][Installation]]
+  - [[#from-melpa][From melpa]]
+  - [[#manual][Manual]]
+- [[#commands][Commands]]
+- [[#options][Options]]
+- [[#license][License]]
+
 * Installation
 ** From melpa
    This package is available from melpa, just do ~M-x package-install RET ialign RET~.
@@ -14,7 +23,7 @@
 (global-set-key (kbd "C-x l") #'ialign-interactive-align)
    #+END_SRC
    You can also bind it to different key (~(kbd "your-key")~).
-* Commands
+* Commands							 :noexport_1:
 ** ~(ialign-interactive-align BEG END)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
 
@@ -48,7 +57,7 @@
    The region is aligned using the current regexp only if it's valid.
    Next alignments will use the newly aligned region.
 
-* Options
+* Options							 :noexport_1:
 ** ~ialign-minibuffer-keymap~
    Keymap used in the minibuffer when ~ialign-interactive-align~ command is executed.
 
