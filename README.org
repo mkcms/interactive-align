@@ -9,6 +9,7 @@
 - [[#installation][Installation]]
   - [[#from-melpa][From melpa]]
   - [[#manual][Manual]]
+- [[#usage][Usage]]
 - [[#commands][Commands]]
 - [[#options][Options]]
 - [[#license][License]]
@@ -16,6 +17,11 @@
 * Installation
 ** From melpa
    This package is available from melpa, just do ~M-x package-install RET ialign RET~.
+   Bind the main function with:
+   #+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x l") #'ialign-interactive-align)
+   #+END_SRC
+
 ** Manual
    Put path to file ~ialign.el~ somewhere in your ~load-path~, then
    #+BEGIN_SRC emacs-lisp
@@ -23,6 +29,16 @@
 (global-set-key (kbd "C-x l") #'ialign-interactive-align)
    #+END_SRC
    You can also bind it to different key (~(kbd "your-key")~).
+* Usage
+  To use it, mark a region and then call ~ialign-interactive-align~.
+  You can enter a regexp in the minibuffer that will be passed to ~align-regexp~ command.
+  As the contents of minibuffer change, the region is realigned.
+  You can also specify other arguments to ~align-regexp~:
+  - Increment/decrement spacing (padding) with ~C-c -~ and ~C-c +~
+  - Increment/decrement the parenthesis group which will be modified with ~C-c [~ and ~C-c ]~
+    Negative parenthesis group means justify (prepend space to each group).
+  - Repeat the alignment throughout the line with ~C-c C-r~.
+
 * Commands							 :noexport_1:
 ** ~(ialign-interactive-align BEG END)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
