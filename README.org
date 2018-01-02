@@ -93,6 +93,10 @@
    - If it is an integer, update if the number of lines in the region is less than or equal to this, otherwise do not update.
 
    The default value is ~t~.
+** ~ialign-initial-regexp~
+   String, initial regexp to use when calling ~ialign-interactive-align~.
+
+   The default value is ~\\(\\s-+\\)~.
 * License
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
