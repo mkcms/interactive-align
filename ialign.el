@@ -83,6 +83,11 @@ or equal to this, otherwise do not update."
 	   (const :tag "Always update" t)
 	   (integer :tag "Update if number of lines is less than or equal")))
 
+(defcustom ialign-initial-regexp "\\(\\s-+\\)"
+  "Initial regexp to use when calling `ialign-interactive-align'."
+  :group 'ialign
+  :type 'regexp)
+
 (defvar ialign--buffer nil)
 (defvar ialign--start nil)
 (defvar ialign--end nil)
@@ -320,7 +325,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	  (progn
 	    (add-hook 'after-change-functions #'ialign--after-change)
 	    (let ((buffer-undo-list t))
-	      (read-from-minibuffer " " "\\(\\s-+\\)" ialign-minibuffer-keymap
+	      (read-from-minibuffer " " ialign-initial-regexp
+                                    ialign-minibuffer-keymap
 				    nil 'ialign--history)
 	      (setq success t)))
 	(if success
