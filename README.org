@@ -19,18 +19,18 @@
    This package is available from melpa, just do ~M-x package-install RET ialign RET~.
    Bind the main function with:
    #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x l") #'ialign-interactive-align)
+(global-set-key (kbd "C-x l") #'ialign)
    #+END_SRC
 
 ** Manual
    Put path to file ~ialign.el~ somewhere in your ~load-path~, then
    #+BEGIN_SRC emacs-lisp
 (require 'ialign)
-(global-set-key (kbd "C-x l") #'ialign-interactive-align)
+(global-set-key (kbd "C-x l") #'ialign)
    #+END_SRC
    You can also bind it to different key (~(kbd "your-key")~).
 * Usage
-  To use it, mark a region and then call ~ialign-interactive-align~.
+  To use it, mark a region and then call ~ialign~.
   You can enter a regexp in the minibuffer that will be passed to ~align-regexp~ command.
   As the contents of minibuffer change, the region is realigned.
   You can also specify other arguments to ~align-regexp~:
@@ -40,7 +40,7 @@
   - Repeat the alignment throughout the line with ~C-c C-r~.
 
 * Commands							 :noexport_1:
-** ~(ialign-interactive-align BEG END)~
+** ~(ialign BEG END)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
 
    As characters are typed in the minibuffer, the region is aligned
@@ -75,7 +75,7 @@
 
 * Options							 :noexport_1:
 ** ~ialign-minibuffer-keymap~
-   Keymap used in the minibuffer when ~ialign-interactive-align~ command is executed.
+   Keymap used in the minibuffer when ~ialign~ command is executed.
 
    | Key     | Command                  |
    |---------+--------------------------|
@@ -110,7 +110,7 @@
 
    The default value is ~t~.
 ** ~ialign-initial-regexp~
-   String, initial regexp to use when calling ~ialign-interactive-align~.
+   String, initial regexp to use when calling ~ialign~.
 
    The default value is ~\\(\\s-+\\)~.
 * License
