@@ -237,11 +237,11 @@ Does nothing when currently not aligning with `ialign'."
 (defun ialign--update-minibuffer-prompt ()
   "Update the minibuffer prompt to show arguments passed to `align-regexp'."
   (let ((inhibit-read-only t)
-	(prompt (format "Align regexp %s(group %s%s, spacing %s%s, %s): "
+	(prompt (format "Align regexp %s(group %s%s, spacing %s%s%s): "
 			(if (ialign--autoupdate-p) "" "(manual) ") ialign--group
 			(if (< ialign--group 0) " (justify)" "") ialign--spacing
 			(if ialign--repeat ", repeat" "")
-			(if (ialign--enable-tabs-p) "with tabs" "no tabs"))))
+			(if (ialign--enable-tabs-p) ", with tabs" ""))))
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
 
 (defun ialign--minibuffer-setup-hook ()
