@@ -50,6 +50,7 @@
     (define-key map (kbd "C-c C-s") #'ialign-set-spacing)
     (define-key map (kbd "C-c RET") #'ialign-commit)
     (define-key map (kbd "C-c C-c") #'ialign-update)
+    (define-key map (kbd "C-c ?") #'ialign-show-help)
     map)
   "Keymap used in minibuffer during `ialign'."
   :group 'ialign)
@@ -237,11 +238,15 @@ Does nothing when currently not aligning with `ialign'."
 (defun ialign--update-minibuffer-prompt ()
   "Update the minibuffer prompt to show arguments passed to `align-regexp'."
   (let ((inhibit-read-only t)
-	(prompt (format "Align regexp %s(group %s%s, spacing %s%s%s): "
+	(prompt
+	 (format "Align regexp %s(group %s%s, spacing %s%s%s, %s): "
 			(if (ialign--autoupdate-p) "" "(manual) ") ialign--group
 			(if (< ialign--group 0) " (justify)" "") ialign--spacing
 			(if ialign--repeat ", repeat" "")
-			(if (ialign--enable-tabs-p) ", with tabs" ""))))
+			(if (ialign--enable-tabs-p) ", with tabs" "")
+			(substitute-command-keys
+			 "\\<ialign-minibuffer-keymap>\\[ialign-show-help]: \
+help"))))
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
 
 (defun ialign--minibuffer-setup-hook ()
@@ -287,6 +292,24 @@ Updates the minibuffer prompt and maybe realigns the region."
 	    (lambda ()
 	      (when ialign--error
 		(minibuffer-message (error-message-string ialign--error)))))))))))
+
+(defun ialign-show-help ()
+  "Show help to the user."
+  (interactive)
+  (with-help-window (help-buffer)
+    (princ
+     (substitute-command-keys
+      "\\<ialign-minibuffer-keymap>Help for command `ialign':
+
+\\[ialign-show-help]: help
+\\[ialign-update]: update (realign)
+\\[ialign-increment-group], \\[ialign-decrement-group]: increment/decrement \
+parenthesis group
+\\[ialign-increment-spacing], \\[ialign-decrement-spacing]: increment/\
+decrement spacing
+\\[ialign-toggle-repeat]: repeat the alignment throughout the line (toggle)
+\\[ialign-toggle-tabs]: toggle tab usage
+\\[ialign-commit]: commit the alignment in buffer"))))
 
 ;;;###autoload
 (defun ialign (beg end)

@@ -72,6 +72,8 @@
 
    The region is aligned using the current regexp only if it's valid.
    Next alignments will use the newly aligned region.
+** ~(ialign-show-help)~
+   Describe available keybindings to the user.
 
 * Options							 :noexport_1:
 ** ~ialign-minibuffer-keymap~
@@ -89,6 +91,7 @@
    | C-c C-s | ialign-set-spacing       |
    | C-c RET | ialign-commit            |
    | C-c C-c | ialign-update            |
+   | C-c ?   | ialign-show-help         |
 ** ~ialign-default-spacing~
    An integer that represents the default amount of padding to use.
 
