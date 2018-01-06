@@ -1,4 +1,4 @@
-;;; ialign.el --- Interactive align-regexp.
+;;; ialign.el --- visual align-regexp
 
 ;;
 ;; Author: Michał Kondraciuk <k.michal@zoho.com>
@@ -25,14 +25,15 @@
 ;;; Commentary:
 ;;
 ;; This package provides command `ialign'
-;; which can be used to interactively align a region
+;; which can be used to visually align a region
 ;; using a regexp read from minibuffer, like `align-regexp'.
 ;;
 ;; See documentation for command `ialign'.
-
-(require 'align)
+;;
 
 ;;; Code:
+
+(require 'align)
 
 (defgroup ialign nil
   "Interactive align-regexp."

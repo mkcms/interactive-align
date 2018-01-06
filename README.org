@@ -1,11 +1,11 @@
-[[https://melpa.org/#/ialign][file:https://melpa.org/packages/ialign-badge.svg]]
+* ialign.el
+  [[https://melpa.org/#/ialign][file:https://melpa.org/packages/ialign-badge.svg]]
 
-* ialign.el - interactive ~align-regexp~
-  Emacs package that provides interactive version of ~align-regexp~ command.
+  Emacs package that provides visual version of ~align-regexp~ command.
 
   [[./demo.gif]]
 * Table of contents						   :TOC:
-- [[#ialignel---interactive-align-regexp][ialign.el - interactive ~align-regexp~]]
+- [[#ialignel][ialign.el]]
 - [[#installation][Installation]]
   - [[#from-melpa][From melpa]]
   - [[#manual][Manual]]
