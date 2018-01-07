@@ -262,6 +262,18 @@ help"))))
    (align-regexp (point-min) (point-max) ialign--regexp
 		 ialign--group ialign--spacing ialign--repeat)))
 
+(defun ialign--undo (beg end orig)
+  "Delete region BEG END and insert ORIG at BEG.
+This function is used to undo changes made by command `ialign'."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (undo-boundary)
+      (delete-region beg end)
+      (goto-char beg)
+      (insert orig)
+      (undo-boundary))))
+
 (defun ialign-update ()
   "Align the region with regexp in the minibuffer for preview.
 Does temporary alignment for preview only.
@@ -354,10 +366,11 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 				    nil 'ialign--history)
 	      (setq success t)))
 	(if success
-	    (progn (push (cons region-contents beg) buffer-undo-list)
-		   (push (cons (marker-position ialign--start)
-			       (marker-position ialign--end))
-			 buffer-undo-list))
+	    (push (list 'apply #'ialign--undo
+			(marker-position ialign--start)
+			(marker-position ialign--end)
+			region-contents)
+		  buffer-undo-list)
 	  (ialign--revert))
 	(set-marker ialign--start nil)
 	(set-marker ialign--end nil)))))
