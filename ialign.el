@@ -385,7 +385,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 			(marker-position ialign--end)
 			region-contents)
 		  buffer-undo-list)
-	  (ialign--revert))
+	  (let ((buffer-undo-list t))
+	    (ialign--revert)))
 	(set-marker ialign--start nil)
 	(set-marker ialign--end nil)))))
 
