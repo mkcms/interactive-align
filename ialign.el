@@ -43,6 +43,7 @@
   (let ((map (copy-keymap minibuffer-local-map)))
     (define-key map (kbd "C-c C-r") #'ialign-toggle-repeat)
     (define-key map (kbd "C-c C-t") #'ialign-toggle-tabs)
+    (define-key map (kbd "C-c M-c") #'ialign-toggle-case-fold)
     (define-key map (kbd "C-c +") #'ialign-increment-spacing)
     (define-key map (kbd "C-c -") #'ialign-decrement-spacing)
     (define-key map (kbd "C-c [") #'ialign-decrement-group)
@@ -101,6 +102,7 @@ or equal to this, otherwise do not update."
 (defvar ialign--regexp nil)
 (defvar ialign--history nil)
 (defvar ialign--error nil)
+(defvar ialign--case-fold-search nil)
 
 (defmacro ialign--with-region-narrowed (&rest forms)
   "Evaluate FORMS in `ialign--buffer'.
@@ -119,6 +121,15 @@ The buffer is narrowed to region that is to be aligned."
 (defun ialign--active-p ()
   "Return non-nil if currently executing `ialign'."
   ialign--buffer)
+
+(defun ialign-toggle-case-fold ()
+  "Toggle case-fold searching on or off."
+  (interactive)
+  (when (ialign--active-p)
+    (setq ialign--case-fold-search (not ialign--case-fold-search))
+    (ialign-update)
+    (minibuffer-message
+     (if ialign--case-fold-search "case insensitive" "case sensitive"))))
 
 (defun ialign-toggle-repeat ()
   "Toggle 'repeat' argument passed to `align-regexp'.
@@ -259,8 +270,9 @@ help"))))
   "Revert the current region, then align it."
   (ialign--revert)
   (ialign--with-region-narrowed
-   (align-regexp (point-min) (point-max) ialign--regexp
-		 ialign--group ialign--spacing ialign--repeat)))
+   (let ((case-fold-search ialign--case-fold-search))
+     (align-regexp (point-min) (point-max) ialign--regexp
+		   ialign--group ialign--spacing ialign--repeat))))
 
 (defun ialign--undo (beg end orig)
   "Delete region BEG END and insert ORIG at BEG.
@@ -322,6 +334,7 @@ parenthesis group
 decrement spacing
 \\[ialign-toggle-repeat]: repeat the alignment throughout the line (toggle)
 \\[ialign-toggle-tabs]: toggle tab usage
+\\[ialign-toggle-case-fold]: toggle case fold searching
 \\[ialign-commit]: commit the alignment in buffer"))))
 
 ;;;###autoload
@@ -356,6 +369,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--spacing ialign-default-spacing)
 	   (ialign--tabs ialign-align-with-tabs)
 	   (ialign--regexp nil)
+	   (ialign--case-fold-search case-fold-search)
 	   success)
       (unwind-protect
 	  (progn
