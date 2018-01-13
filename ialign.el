@@ -419,11 +419,14 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 				    nil 'ialign--history)
 	      (setq success t)))
 	(if success
-	    (push (list 'apply #'ialign--undo
-			(marker-position ialign--start)
-			(marker-position ialign--end)
-			region-contents)
-		  buffer-undo-list)
+	    (progn
+	      (unless (ialign--autoupdate-p)
+		(ialign--align))
+	      (push (list 'apply #'ialign--undo
+			  (marker-position ialign--start)
+			  (marker-position ialign--end)
+			  region-contents)
+		    buffer-undo-list))
 	  (let ((buffer-undo-list t))
 	    (ialign--revert)))
 	(set-marker ialign--start nil)
