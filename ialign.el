@@ -418,19 +418,20 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
                                     ialign-minibuffer-keymap
 				    nil 'ialign--history)
 	      (setq success t)))
-	(if success
-	    (progn
-	      (unless (ialign--autoupdate-p)
-		(ialign--align))
-	      (push (list 'apply #'ialign--undo
-			  (marker-position ialign--start)
-			  (marker-position ialign--end)
-			  region-contents)
-		    buffer-undo-list))
-	  (let ((buffer-undo-list t))
-	    (ialign--revert)))
-	(set-marker ialign--start nil)
-	(set-marker ialign--end nil)))))
+	(unwind-protect
+	    (if success
+		(progn
+		  (unless (ialign--autoupdate-p)
+		    (ialign--align))
+		  (push (list 'apply #'ialign--undo
+			      (marker-position ialign--start)
+			      (marker-position ialign--end)
+			      region-contents)
+			buffer-undo-list))
+	      (let ((buffer-undo-list t))
+		(ialign--revert)))
+	  (set-marker ialign--start nil)
+	  (set-marker ialign--end nil))))))
 
 ;;;###autoload
 (define-obsolete-function-alias 'ialign-interactive-align 'ialign "0.1.0")
