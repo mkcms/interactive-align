@@ -265,12 +265,12 @@ Does nothing when currently not aligning with `ialign'."
   (let ((inhibit-read-only t)
 	(prompt
 	 (format "Align regexp %s(group %s%s, spacing %s%s%s, %s): "
-			(if (ialign--autoupdate-p) "" "(manual) ") ialign--group
-			(if (< ialign--group 0) " (justify)" "") ialign--spacing
-			(if ialign--repeat ", repeat" "")
-			(if (ialign--enable-tabs-p) ", with tabs" "")
-			(substitute-command-keys
-			 "\\<ialign-minibuffer-keymap>\\[ialign-show-help]: \
+		 (if (ialign--autoupdate-p) "" "(manual) ") ialign--group
+		 (if (< ialign--group 0) " (justify)" "") ialign--spacing
+		 (if ialign--repeat ", repeat" "")
+		 (if (ialign--enable-tabs-p) ", with tabs" "")
+		 (substitute-command-keys
+		  "\\<ialign-minibuffer-keymap>\\[ialign-show-help]: \
 help"))))
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
 
@@ -360,7 +360,8 @@ Updates the minibuffer prompt and maybe realigns the region."
 	    0.05 nil
 	    (lambda ()
 	      (when ialign--error
-		(minibuffer-message (error-message-string ialign--error)))))))))))
+		(minibuffer-message
+		 (error-message-string ialign--error)))))))))))
 
 (defun ialign-exit-minibuffer ()
   "Save settings in history and exit minibuffer."
