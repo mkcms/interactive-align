@@ -53,6 +53,7 @@
     (define-key map (kbd "C-c RET") #'ialign-commit)
     (define-key map (kbd "C-c C-c") #'ialign-update)
     (define-key map (kbd "C-c ?") #'ialign-show-help)
+    (define-key map [remap exit-minibuffer] #'ialign-exit-minibuffer)
     map)
   "Keymap used in minibuffer during `ialign'."
   :group 'ialign)
@@ -286,6 +287,36 @@ This function is used to undo changes made by command `ialign'."
       (insert orig)
       (undo-boundary))))
 
+(defun ialign--restore-arguments ()
+  "Restore global variables stored in properties of minibuffer contents."
+  (let ((props
+	 (plist-get (text-properties-at 0 (minibuffer-contents)) 'ialign)))
+    (when props
+      (when minibuffer-text-before-history
+	(let ((orig-props
+	       (plist-get
+		(text-properties-at 0 minibuffer-text-before-history)
+		'ialign)))
+	  (unless orig-props
+	    (put-text-property
+	     0 (min 1 (length minibuffer-text-before-history))
+	     'ialign
+	     (list ialign--group ialign--spacing ialign--repeat)
+	     minibuffer-text-before-history))))
+      (setq ialign--group (nth 0 props)
+ 	    ialign--spacing (nth 1 props)
+	    ialign--repeat (nth 2 props))
+      (remove-list-of-text-properties
+       (minibuffer-prompt-end) (point-max) '(ialign)))))
+
+(defun ialign--save-arguments ()
+  "Save global variables in properties of minibuffer contents."
+  (let ((inhibit-modification-hooks t))
+    (put-text-property
+     (minibuffer-prompt-end) (1+ (minibuffer-prompt-end))
+     'ialign
+     (list ialign--group ialign--spacing ialign--repeat))))
+
 (defun ialign-update ()
   "Align the region with regexp in the minibuffer for preview.
 Does temporary alignment for preview only.
@@ -306,6 +337,7 @@ Updates the minibuffer prompt and maybe realigns the region."
   (when (and (ialign--active-p) (minibufferp))
     (condition-case err
 	(progn
+	  (ialign--restore-arguments)
 	  (ialign-update)
 	  (setq ialign--error nil))
       (error
@@ -317,6 +349,12 @@ Updates the minibuffer prompt and maybe realigns the region."
 	    (lambda ()
 	      (when ialign--error
 		(minibuffer-message (error-message-string ialign--error)))))))))))
+
+(defun ialign-exit-minibuffer ()
+  "Save settings in history and exit minibuffer."
+  (interactive)
+  (ialign--save-arguments)
+  (exit-minibuffer))
 
 (defun ialign-show-help ()
   "Show help to the user."
@@ -374,7 +412,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
       (unwind-protect
 	  (progn
 	    (add-hook 'after-change-functions #'ialign--after-change)
-	    (let ((buffer-undo-list t))
+	    (let ((buffer-undo-list t)
+		  (minibuffer-allow-text-properties t))
 	      (read-from-minibuffer " " ialign-initial-regexp
                                     ialign-minibuffer-keymap
 				    nil 'ialign--history)
