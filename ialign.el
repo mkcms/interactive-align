@@ -361,7 +361,8 @@ Updates the minibuffer prompt and maybe realigns the region."
 	    (lambda ()
 	      (when ialign--error
 		(minibuffer-message
-		 (error-message-string ialign--error)))))))))))
+		 (error-message-string ialign--error)))
+	      (setq ialign--error nil)))))))))
 
 (defun ialign-exit-minibuffer ()
   "Save settings in history and exit minibuffer."
