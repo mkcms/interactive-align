@@ -390,11 +390,16 @@ element
 \\[ialign-commit]: commit the alignment in buffer"))))
 
 ;;;###autoload
-(defun ialign (beg end)
+(defun ialign (beg end &optional regexp group spacing repeat)
   "Interactively align region BEG END using regexp read from minibuffer.
 As characters are typed in the minibuffer, the region is aligned
 using `align-regexp' and the result is presented to the user.
 \\<ialign-minibuffer-keymap>
+Arguments REGEXP, GROUP, SPACING and REPEAT are passed to `align-regexp',
+and default to `ialign-initial-regexp', `ialign-initial-group',
+`ialign-initial-spacing' and `ialign-initial-repeat'
+respectively.
+
 If the custom option `ialign-auto-update' is not set to t, manual update is
 possible with command `ialign-update' bound to \\[ialign-update].
 
@@ -409,6 +414,10 @@ and \\[ialign-set-spacing].
 The keymap used in minibuffer is `ialign-minibuffer-keymap':
 \\{ialign-minibuffer-keymap}"
   (interactive "r")
+  (or regexp (setq regexp ialign-initial-regexp))
+  (or group (setq group ialign-initial-group))
+  (or spacing (setq spacing ialign-initial-spacing))
+  (or repeat (setq repeat ialign-initial-repeat))
   (if (ialign--active-p)
       (error "Already aligning")
     (let* ((ialign--buffer (current-buffer))
@@ -416,8 +425,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--end (ialign--make-marker end))
 	   (region-contents (buffer-substring beg end))
 	   (ialign--region-contents region-contents)
-	   (ialign--repeat ialign-initial-repeat)
-	   (ialign--group ialign-initial-group)
+	   (ialign--repeat repeat)
+	   (ialign--group group)
 	   (ialign--spacing ialign-default-spacing)
 	   (ialign--tabs ialign-align-with-tabs)
 	   (ialign--regexp nil)
@@ -428,7 +437,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	    (add-hook 'after-change-functions #'ialign--after-change)
 	    (let ((buffer-undo-list t)
 		  (minibuffer-allow-text-properties t))
-	      (read-from-minibuffer " " ialign-initial-regexp
+	      (read-from-minibuffer " " regexp
                                     ialign-minibuffer-keymap
 				    nil 'ialign--history)
 	      (setq success t)))
