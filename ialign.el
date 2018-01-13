@@ -92,6 +92,18 @@ or equal to this, otherwise do not update."
   :group 'ialign
   :type 'regexp)
 
+(defcustom ialign-initial-group 1
+  "Initial group to use when calling `ialign'."
+  :group 'ialign
+  :type 'integer)
+
+(defcustom ialign-initial-repeat nil
+  "Initial value of repeat argument when calling `ialign'."
+  :group 'ialign
+  :type 'booleanp)
+
+(defvaralias 'ialign-initial-spacing 'ialign-default-spacing)
+
 (defvar ialign--buffer nil)
 (defvar ialign--start nil)
 (defvar ialign--end nil)
@@ -404,8 +416,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--end (ialign--make-marker end))
 	   (region-contents (buffer-substring beg end))
 	   (ialign--region-contents region-contents)
-	   (ialign--repeat nil)
-	   (ialign--group 1)
+	   (ialign--repeat ialign-initial-repeat)
+	   (ialign--group ialign-initial-group)
 	   (ialign--spacing ialign-default-spacing)
 	   (ialign--tabs ialign-align-with-tabs)
 	   (ialign--regexp nil)
