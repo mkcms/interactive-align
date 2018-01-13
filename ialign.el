@@ -325,7 +325,7 @@ This function is used to undo changes made by command `ialign'."
   "Save global variables in properties of minibuffer contents."
   (let ((inhibit-modification-hooks t))
     (put-text-property
-     (minibuffer-prompt-end) (1+ (minibuffer-prompt-end))
+     (minibuffer-prompt-end) (min (point-max) (1+ (minibuffer-prompt-end)))
      'ialign
      (list ialign--group ialign--spacing ialign--repeat))))
 
