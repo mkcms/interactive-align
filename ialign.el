@@ -373,6 +373,8 @@ decrement spacing
 \\[ialign-toggle-repeat]: repeat the alignment throughout the line (toggle)
 \\[ialign-toggle-tabs]: toggle tab usage
 \\[ialign-toggle-case-fold]: toggle case fold searching
+\\[next-history-element], \\[previous-history-element]: next/previous history \
+element
 \\[ialign-commit]: commit the alignment in buffer"))))
 
 ;;;###autoload

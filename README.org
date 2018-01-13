@@ -38,6 +38,9 @@
   - Increment/decrement the parenthesis group which will be modified with ~C-c [~ and ~C-c ]~
     Negative parenthesis group means justify (prepend space to each group).
   - Repeat the alignment throughout the line with ~C-c C-r~.
+  - Toggle tabs with ~C-c C-t~.
+  - Toggle case sensitivity with ~C-c M-c~.
+  - Go to next/previous history element with ~M-n~ and ~M-p~.
 
 * Commands							 :noexport_1:
 ** ~(ialign BEG END)~
