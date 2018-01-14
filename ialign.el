@@ -463,7 +463,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	  (set-marker ialign--start nil)
 	  (set-marker ialign--end nil)
 	  (when (overlayp ialign--minibuffer-overlay)
-	    (delete-overlay ialign--minibuffer-overlay)))))))
+	    (delete-overlay ialign--minibuffer-overlay)))))
+    (setq deactivate-mark t)))
 
 ;;;###autoload
 (define-obsolete-function-alias 'ialign-interactive-align 'ialign "0.1.0")
