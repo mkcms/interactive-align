@@ -116,6 +116,7 @@ or equal to this, otherwise do not update."
 (defvar ialign--history nil)
 (defvar ialign--error nil)
 (defvar ialign--case-fold-search nil)
+(defvar ialign--minibuffer-overlay nil)
 
 (defmacro ialign--with-region-narrowed (&rest forms)
   "Evaluate FORMS in `ialign--buffer'.
@@ -140,7 +141,7 @@ The buffer is narrowed to region that is to be aligned."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--case-fold-search (not ialign--case-fold-search))
-    (ialign-update)
+    (ignore-errors (ialign-update))
     (minibuffer-message
      (if ialign--case-fold-search "case insensitive" "case sensitive"))))
 
@@ -272,7 +273,16 @@ Does nothing when currently not aligning with `ialign'."
 		 (substitute-command-keys
 		  "\\<ialign-minibuffer-keymap>\\[ialign-show-help]: \
 help"))))
-    (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)))
+    (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)
+    (when (overlayp ialign--minibuffer-overlay)
+	(delete-overlay ialign--minibuffer-overlay)
+	(setq ialign--minibuffer-overlay nil))
+    (when ialign--error
+      (let ((msg (concat " [" ialign--error "]")))
+	(setq ialign--minibuffer-overlay
+	      (make-overlay (point-max) (point-max) nil t t))
+	(put-text-property 0 1 'cursor t msg)
+	(overlay-put ialign--minibuffer-overlay 'after-string msg)))))
 
 (defun ialign--minibuffer-setup-hook ()
   "Function called on minibuffer setup.  Aligns the region."
@@ -351,18 +361,13 @@ Updates the minibuffer prompt and maybe realigns the region."
 	(progn
 	  (ialign--restore-arguments)
 	  (ialign-update)
-	  (setq ialign--error nil))
+	  (when ialign--error
+	    (setq ialign--error nil)
+	    (ialign--update-minibuffer-prompt)))
       (error
        (progn
-	 (unless ialign--error
-	   (setq ialign--error err)
-	   (run-with-timer
-	    0.05 nil
-	    (lambda ()
-	      (when ialign--error
-		(minibuffer-message
-		 (error-message-string ialign--error)))
-	      (setq ialign--error nil)))))))))
+	 (setq ialign--error (error-message-string err))
+	 (ialign--update-minibuffer-prompt))))))
 
 (defun ialign-exit-minibuffer ()
   "Save settings in history and exit minibuffer."
@@ -456,7 +461,9 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	      (let ((buffer-undo-list t))
 		(ialign--revert)))
 	  (set-marker ialign--start nil)
-	  (set-marker ialign--end nil))))))
+	  (set-marker ialign--end nil)
+	  (when (overlayp ialign--minibuffer-overlay)
+	    (delete-overlay ialign--minibuffer-overlay)))))))
 
 ;;;###autoload
 (define-obsolete-function-alias 'ialign-interactive-align 'ialign "0.1.0")
