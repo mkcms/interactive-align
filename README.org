@@ -43,7 +43,7 @@
   - Go to next/previous history element with ~M-n~ and ~M-p~.
 
 * Commands							 :noexport_1:
-** ~(ialign BEG END)~
+** ~(ialign BEG END &optional REGEXP GROUP SPACING REPEAT)~
    Interactively align region /BEG/ /END/ using regexp read from minibuffer.
 
    As characters are typed in the minibuffer, the region is aligned
