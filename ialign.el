@@ -117,6 +117,7 @@ or equal to this, otherwise do not update."
 (defvar ialign--error nil)
 (defvar ialign--case-fold-search nil)
 (defvar ialign--minibuffer-overlay nil)
+(defvar ialign--recursive-minibuffer nil)
 
 (defmacro ialign--with-region-narrowed (&rest forms)
   "Evaluate FORMS in `ialign--buffer'.
@@ -179,12 +180,23 @@ Does nothing when currently not aligning with `ialign'."
   (interactive)
   (ialign-set-group (1- ialign--group)))
 
+(defun ialign--read-number (prompt)
+  "Read number with PROMPT in a new minibuffer."
+  (let ((enable-recursive-minibuffers t)
+	(ialign--recursive-minibuffer t))
+    (read-number prompt)))
+
 (defun ialign-set-group (group)
   "Set the parenthesis group argument for the `align-regexp' command to GROUP.
-This should be called with a numeric prefix argument that is
-the group number to set.
+Interactively, reads a number from minibuffer, unless this function was called
+with a numeric prefix argument, in which case the prefix argument is used as
+GROUP.
 Does nothing when currently not aligning with `ialign'."
-  (interactive "p")
+  (interactive (list
+		(if current-prefix-arg
+		    (prefix-numeric-value current-prefix-arg)
+		  (ialign--read-number
+		   "Parenthesis group to modify (justify if negative): "))))
   (or group (setq group 1))
   (when (ialign--active-p)
     (setq ialign--group group)
@@ -210,9 +222,14 @@ Does nothing when currently not aligning with `ialign'."
 
 (defun ialign-set-spacing (spacing)
   "Set the spacing parameter passed to `align-regexp' command to SPACING.
-This should be called with a numeric prefix argument.
+Interactively, reads a number from minibuffer, unless this function was called
+with a numeric prefix argument, in which case the prefix argument is used as
+SPACING.
 Does nothing when currently not aligning with `ialign'."
-  (interactive "p")
+  (interactive (list
+		(if current-prefix-arg
+		    (prefix-numeric-value current-prefix-arg)
+		  (ialign--read-number "Amount of spacing: "))))
   (or spacing (setq spacing 1))
   (when (ialign--active-p)
     (setq ialign--spacing spacing)
@@ -286,7 +303,9 @@ help"))))
 
 (defun ialign--minibuffer-setup-hook ()
   "Function called on minibuffer setup.  Aligns the region."
-  (and (ialign--active-p) (ialign-update)))
+  (and (ialign--active-p)
+       (not ialign--recursive-minibuffer)
+       (ialign-update)))
 (add-hook 'minibuffer-setup-hook #'ialign--minibuffer-setup-hook)
 
 (defun ialign--align ()
@@ -356,7 +375,8 @@ Use `ialign-commit' to actually align the region in the buffer."
 (defun ialign--after-change (beg end len)
   "Function called after change.
 Updates the minibuffer prompt and maybe realigns the region."
-  (when (and (ialign--active-p) (minibufferp))
+  (when (and (ialign--active-p) (minibufferp)
+	     (not ialign--recursive-minibuffer))
     (condition-case err
 	(progn
 	  (ialign--restore-arguments)
@@ -387,8 +407,10 @@ Updates the minibuffer prompt and maybe realigns the region."
 \\[ialign-update]: update (realign)
 \\[ialign-increment-group], \\[ialign-decrement-group]: increment/decrement \
 parenthesis group
+\\[ialign-set-group]: read group from minibuffer
 \\[ialign-increment-spacing], \\[ialign-decrement-spacing]: increment/\
 decrement spacing
+\\[ialign-set-spacing]: read spacing from minibuffer
 \\[ialign-toggle-repeat]: repeat the alignment throughout the line (toggle)
 \\[ialign-toggle-tabs]: toggle tab usage
 \\[ialign-toggle-case-fold]: toggle case fold searching
@@ -430,6 +452,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
     (let* ((ialign--buffer (current-buffer))
 	   (ialign--start (ialign--make-marker beg))
 	   (ialign--end (ialign--make-marker end))
+	   (ialign--recursive-minibuffer nil)
 	   (region-contents (buffer-substring beg end))
 	   (ialign--region-contents region-contents)
 	   (ialign--repeat repeat)

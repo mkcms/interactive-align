@@ -62,14 +62,13 @@
 ** ~(ialign-set-group GROUP)~
    Set the parenthesis group argument for the ~align-regexp~ command to /GROUP/.
 
-   This should be called with a numeric prefix argument that is
-   the group number to set.
+   Interactively, this will read /GROUP/ from minibuffer.
 ** ~(ialign-increment-group)~, ~(ialign-decrement-group)~
    Increment/decrement the parenthesis group argument passed to ~align-regexp~.
 ** ~(ialign-set-spacing SPACING)~
    Set the spacing parameter passed to ~align-regexp~ command to /SPACING/.
 
-   This should be called with a numeric prefix argument.
+   Interactively, this will read /SPACING/ from minibuffer.
 ** ~(ialign-increment-spacing)~, ~(ialign-decrement-spacing)~
    Increment/decrement the amount of spacing passed to ~align-regexp~ command.
 ** ~(ialign-commit)~
