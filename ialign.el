@@ -122,6 +122,7 @@ or equal to this, otherwise do not update."
 (defmacro ialign--with-region-narrowed (&rest forms)
   "Evaluate FORMS in `ialign--buffer'.
 The buffer is narrowed to region that is to be aligned."
+  (declare (debug (&rest form)))
   `(with-current-buffer ialign--buffer
      (save-excursion
        (save-restriction
