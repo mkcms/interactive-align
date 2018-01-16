@@ -243,10 +243,11 @@ Next alignments will use the newly aligned region.
 Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
+    (let ((ialign-auto-update t))
+      (ialign-update))
     (ialign--with-region-narrowed
-     (ialign-update)
-     (setq ialign--region-contents (buffer-substring (point-min) (point-max)))
-     (minibuffer-message "Commited regexp %s" ialign--regexp))))
+     (setq ialign--region-contents (buffer-substring (point-min) (point-max))))
+    (minibuffer-message "Commited regexp %s" ialign--regexp)))
 
 (defun ialign--make-marker (location)
   "Make marker at LOCATION."
