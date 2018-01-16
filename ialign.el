@@ -143,7 +143,7 @@ The buffer is narrowed to region that is to be aligned."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--case-fold-search (not ialign--case-fold-search))
-    (ignore-errors (ialign-update))
+    (ialign-update 'quietly)
     (minibuffer-message
      (if ialign--case-fold-search "case insensitive" "case sensitive"))))
 
@@ -155,7 +155,7 @@ Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--repeat (not ialign--repeat))
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-toggle-tabs ()
   "Toggle tab usage during alignment.
@@ -165,7 +165,7 @@ Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--tabs (not ialign--tabs))
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-increment-group ()
   "Increment the parenthesis group argument passed to `align-regexp'.
@@ -201,7 +201,7 @@ Does nothing when currently not aligning with `ialign'."
   (or group (setq group 1))
   (when (ialign--active-p)
     (setq ialign--group group)
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-increment-spacing ()
   "Increment the amount of spacing passed to `align-regexp' command.
@@ -210,7 +210,7 @@ Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--spacing (1+ ialign--spacing))
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-decrement-spacing ()
   "Decrement the amount of spacing passed to `align-regexp' command.
@@ -219,7 +219,7 @@ Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
     (setq ialign--spacing (1- ialign--spacing))
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-set-spacing (spacing)
   "Set the spacing parameter passed to `align-regexp' command to SPACING.
@@ -234,7 +234,7 @@ Does nothing when currently not aligning with `ialign'."
   (or spacing (setq spacing 1))
   (when (ialign--active-p)
     (setq ialign--spacing spacing)
-    (ialign-update)))
+    (ialign-update 'quietly)))
 
 (defun ialign-commit ()
   "Align the region using the current regexp and commit change in the buffer.
@@ -307,7 +307,7 @@ help"))))
   "Function called on minibuffer setup.  Aligns the region."
   (and (ialign--active-p)
        (not ialign--recursive-minibuffer)
-       (ialign-update)))
+       (ialign-update 'quietly)))
 (add-hook 'minibuffer-setup-hook #'ialign--minibuffer-setup-hook)
 
 (defun ialign--align ()
@@ -360,36 +360,39 @@ This function is used to undo changes made by command `ialign'."
      'ialign
      (list ialign--group ialign--spacing ialign--repeat))))
 
-(defun ialign-update ()
+(defun ialign-update (&optional no-error)
   "Align the region with regexp in the minibuffer for preview.
 Does temporary alignment for preview only.
+The argument NO-ERROR, if non-nil means ignore any errors.
 Use `ialign-commit' to actually align the region in the buffer."
   (interactive)
   (when (and (ialign--active-p) (minibufferp))
-    (ialign--update-minibuffer-prompt)
-    (when (or (called-interactively-p 'interactive) (ialign--autoupdate-p))
-      (let ((regexp (minibuffer-contents-no-properties))
-	    (indent-tabs-mode (ialign--enable-tabs-p)))
-	(setq ialign--regexp regexp)
-	(ialign--align)
-	(redisplay)))))
+    (condition-case err
+	(progn
+	  (ialign--update-minibuffer-prompt)
+	  (when (or (called-interactively-p 'interactive)
+		    (ialign--autoupdate-p))
+	    (let ((regexp (minibuffer-contents-no-properties))
+		  (indent-tabs-mode (ialign--enable-tabs-p)))
+	      (setq ialign--regexp regexp)
+	      (ialign--align)
+	      (redisplay))))
+      (error
+       (progn
+	 (setq ialign--error (error-message-string err))
+	 (ialign--update-minibuffer-prompt)
+	 (unless no-error
+	   (signal (car err) (cdr err))))))))
 
 (defun ialign--after-change (beg end len)
   "Function called after change.
 Updates the minibuffer prompt and maybe realigns the region."
   (when (and (ialign--active-p) (minibufferp)
 	     (not ialign--recursive-minibuffer))
-    (condition-case err
-	(progn
-	  (ialign--restore-arguments)
-	  (ialign-update)
-	  (when ialign--error
-	    (setq ialign--error nil)
-	    (ialign--update-minibuffer-prompt)))
-      (error
-       (progn
-	 (setq ialign--error (error-message-string err))
-	 (ialign--update-minibuffer-prompt))))))
+    (ignore-errors
+      (ialign--restore-arguments)
+      (setq ialign--error nil)
+      (ignore-errors (ialign-update)))))
 
 (defun ialign-exit-minibuffer ()
   "Save settings in history and exit minibuffer."
