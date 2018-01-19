@@ -53,7 +53,6 @@
     (define-key map (kbd "C-c RET") #'ialign-commit)
     (define-key map (kbd "C-c C-c") #'ialign-update)
     (define-key map (kbd "C-c ?") #'ialign-show-help)
-    (define-key map [remap exit-minibuffer] #'ialign-exit-minibuffer)
     map)
   "Keymap used in minibuffer during `ialign'."
   :group 'ialign)
@@ -352,13 +351,12 @@ This function is used to undo changes made by command `ialign'."
       (remove-list-of-text-properties
        (minibuffer-prompt-end) (point-max) '(ialign)))))
 
-(defun ialign--save-arguments ()
-  "Save global variables in properties of minibuffer contents."
-  (let ((inhibit-modification-hooks t))
-    (put-text-property
-     (minibuffer-prompt-end) (min (point-max) (1+ (minibuffer-prompt-end)))
-     'ialign
-     (list ialign--group ialign--spacing ialign--repeat))))
+(defun ialign--regexp-with-state ()
+  "Return `ialign--regexp' with properties that store current state.
+These properties are restored with `ialign--restore-arguments'"
+  (propertize ialign--regexp
+	      'ialign
+	      (list ialign--group ialign--spacing ialign--repeat)))
 
 (defun ialign-update (&optional no-error)
   "Align the region with regexp in the minibuffer for preview.
@@ -393,12 +391,6 @@ Updates the minibuffer prompt and maybe realigns the region."
       (ialign--restore-arguments)
       (setq ialign--error nil)
       (ignore-errors (ialign-update)))))
-
-(defun ialign-exit-minibuffer ()
-  "Save settings in history and exit minibuffer."
-  (interactive)
-  (ialign--save-arguments)
-  (exit-minibuffer))
 
 (defun ialign-show-help ()
   "Show help to the user."
@@ -471,10 +463,13 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	  (progn
 	    (add-hook 'after-change-functions #'ialign--after-change)
 	    (let ((buffer-undo-list t)
-		  (minibuffer-allow-text-properties t))
+		  (minibuffer-allow-text-properties t)
+		  (history-add-new-input nil))
 	      (read-from-minibuffer " " regexp
                                     ialign-minibuffer-keymap
 				    nil 'ialign--history)
+	      (add-to-history 'ialign--history
+			      (ialign--regexp-with-state))
 	      (setq success t)))
 	(unwind-protect
 	    (if success
