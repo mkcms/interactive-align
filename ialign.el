@@ -208,8 +208,7 @@ Use `ialign-set-spacing' to set the spacing to specific number.
 Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
-    (setq ialign--spacing (1+ ialign--spacing))
-    (ialign-update 'quietly)))
+    (ialign-set-spacing (1+ ialign--spacing))))
 
 (defun ialign-decrement-spacing ()
   "Decrement the amount of spacing passed to `align-regexp' command.
@@ -217,8 +216,7 @@ Use `ialign-set-spacing' to set the spacing to specific number.
 Does nothing when currently not aligning with `ialign'."
   (interactive)
   (when (ialign--active-p)
-    (setq ialign--spacing (1- ialign--spacing))
-    (ialign-update 'quietly)))
+    (ialign-set-spacing (1- ialign--spacing))))
 
 (defun ialign-set-spacing (spacing)
   "Set the spacing parameter passed to `align-regexp' command to SPACING.
@@ -276,7 +274,7 @@ Does nothing when currently not aligning with `ialign'."
       (ialign--with-region-narrowed
        (<= (- (line-number-at-pos (point-max))
 	      (line-number-at-pos (point-min)))
-	  ialign-auto-update))
+	   ialign-auto-update))
     ialign-auto-update))
 
 (defun ialign--update-minibuffer-prompt ()
@@ -293,8 +291,8 @@ Does nothing when currently not aligning with `ialign'."
 help"))))
     (put-text-property (point-min) (minibuffer-prompt-end) 'display prompt)
     (when (overlayp ialign--minibuffer-overlay)
-	(delete-overlay ialign--minibuffer-overlay)
-	(setq ialign--minibuffer-overlay nil))
+      (delete-overlay ialign--minibuffer-overlay)
+      (setq ialign--minibuffer-overlay nil))
     (when ialign--error
       (let ((msg (concat " [" ialign--error "]")))
 	(setq ialign--minibuffer-overlay
@@ -392,7 +390,7 @@ Updates the minibuffer prompt and maybe realigns the region."
     (ignore-errors
       (ialign--restore-arguments)
       (setq ialign--error nil)
-      (ignore-errors (ialign-update)))))
+      (ialign-update))))
 
 (defun ialign-show-help ()
   "Show help to the user."
