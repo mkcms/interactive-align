@@ -377,7 +377,9 @@ Use `ialign-commit' to actually align the region in the buffer."
 	      (redisplay))))
       (error
        (progn
-	 (setq ialign--error (error-message-string err))
+	 (setq ialign--error
+	       (if (eq (car err) 'invalid-regexp)
+		   (cadr err) (error-message-string err)))
 	 (ialign--update-minibuffer-prompt)
 	 (unless no-error
 	   (signal (car err) (cdr err))))))))
