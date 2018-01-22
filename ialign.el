@@ -133,7 +133,7 @@ The buffer is narrowed to region that is to be aligned."
 	   (set-marker ialign--start (point-min))
 	   (set-marker ialign--end (point-max)))))))
 
-(defun ialign--active-p ()
+(defsubst ialign--active-p ()
   "Return non-nil if currently executing `ialign'."
   ialign--buffer)
 
@@ -246,7 +246,7 @@ Does nothing when currently not aligning with `ialign'."
      (setq ialign--region-contents (buffer-substring (point-min) (point-max))))
     (minibuffer-message "Commited regexp %s" ialign--regexp)))
 
-(defun ialign--make-marker (location)
+(defsubst ialign--make-marker (location)
   "Make marker at LOCATION."
   (let ((marker (make-marker)))
     (set-marker marker location)
@@ -349,7 +349,7 @@ This function is used to undo changes made by command `ialign'."
       (remove-list-of-text-properties
        (minibuffer-prompt-end) (point-max) '(ialign)))))
 
-(defun ialign--regexp-with-state ()
+(defsubst ialign--regexp-with-state ()
   "Return `ialign--regexp' with properties that store current state.
 These properties are restored with `ialign--restore-arguments'"
   (propertize ialign--regexp
