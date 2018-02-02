@@ -454,7 +454,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--region-contents region-contents)
 	   (ialign--repeat repeat)
 	   (ialign--group group)
-	   (ialign--spacing ialign-default-spacing)
+	   (ialign--spacing spacing)
 	   (ialign--tabs ialign-align-with-tabs)
 	   (ialign--regexp nil)
 	   (ialign--case-fold-search case-fold-search)
