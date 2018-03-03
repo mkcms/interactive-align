@@ -99,7 +99,7 @@ or equal to this, otherwise do not update."
 (defcustom ialign-initial-repeat nil
   "Initial value of repeat argument when calling `ialign'."
   :group 'ialign
-  :type 'booleanp)
+  :type 'boolean)
 
 (defvaralias 'ialign-initial-spacing 'ialign-default-spacing)
 
