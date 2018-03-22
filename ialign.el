@@ -197,13 +197,6 @@ help"))))
 	(put-text-property 0 1 'cursor t msg)
 	(overlay-put ialign--minibuffer-overlay 'after-string msg)))))
 
-(defun ialign--minibuffer-setup-hook ()
-  "Function called on minibuffer setup.  Aligns the region."
-  (and (ialign--active-p)
-       (not ialign--recursive-minibuffer)
-       (ialign-update 'quietly)))
-(add-hook 'minibuffer-setup-hook #'ialign--minibuffer-setup-hook)
-
 (defun ialign--align ()
   "Revert the current region, then align it."
   (ialign--revert)
@@ -460,8 +453,11 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--case-fold-search case-fold-search)
 	   success)
       (unwind-protect
-	  (progn
-	    (add-hook 'after-change-functions #'ialign--after-change)
+	  (minibuffer-with-setup-hook
+	      (lambda ()
+		(unless ialign--recursive-minibuffer
+		  (add-hook 'after-change-functions #'ialign--after-change nil t)
+		  (ialign-update 'quietly)))
 	    (let ((buffer-undo-list t)
 		  (minibuffer-allow-text-properties t)
 		  (history-add-new-input nil))
