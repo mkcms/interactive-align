@@ -130,8 +130,8 @@ The buffer is narrowed to region that is to be aligned."
 	 (unwind-protect
 	     (progn
 	       ,@forms)
-	   (set-marker ialign--start (point-min))
-	   (set-marker ialign--end (point-max)))))))
+	   (setq ialign--start (point-min)
+		 ialign--end (point-max)))))))
 
 (defun ialign--active-p ()
   "Return non-nil if currently executing `ialign'."
@@ -142,13 +142,6 @@ The buffer is narrowed to region that is to be aligned."
   (let ((enable-recursive-minibuffers t)
 	(ialign--recursive-minibuffer t))
     (read-number prompt)))
-
-(defun ialign--make-marker (location)
-  "Make marker at LOCATION."
-  (let ((marker (make-marker)))
-    (set-marker marker location)
-    (set-marker-insertion-type marker t)
-    marker))
 
 (defun ialign--revert ()
   "Revert the aligned region to original `ialign--region-contents'."
@@ -440,8 +433,8 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
   (if (ialign--active-p)
       (error "Already aligning")
     (let* ((ialign--buffer (current-buffer))
-	   (ialign--start (ialign--make-marker beg))
-	   (ialign--end (ialign--make-marker end))
+	   (ialign--start beg)
+	   (ialign--end end)
 	   (ialign--recursive-minibuffer nil)
 	   (region-contents (buffer-substring beg end))
 	   (ialign--region-contents region-contents)
@@ -473,14 +466,12 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 		  (unless (ialign--autoupdate-p)
 		    (ialign--align))
 		  (push (list 'apply #'ialign--undo
-			      (marker-position ialign--start)
-			      (marker-position ialign--end)
+			      ialign--start
+			      ialign--end
 			      region-contents)
 			buffer-undo-list))
 	      (let ((buffer-undo-list t))
 		(ialign--revert)))
-	  (set-marker ialign--start nil)
-	  (set-marker ialign--end nil)
 	  (when (overlayp ialign--minibuffer-overlay)
 	    (delete-overlay ialign--minibuffer-overlay)))))
     (setq deactivate-mark t)))
