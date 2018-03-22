@@ -104,7 +104,7 @@ or equal to this, otherwise do not update."
 (defvaralias 'ialign-initial-spacing 'ialign-default-spacing)
 
 (defvar ialign--buffer nil)
-(defvar ialign--start nil)
+(defvar ialign--beg nil)
 (defvar ialign--end nil)
 (defvar ialign--region-contents nil)
 (defvar ialign--tabs nil)
@@ -126,11 +126,11 @@ The buffer is narrowed to region that is to be aligned."
      (save-excursion
        (save-restriction
 	 (widen)
-	 (narrow-to-region ialign--start ialign--end)
+	 (narrow-to-region ialign--beg ialign--end)
 	 (unwind-protect
 	     (progn
 	       ,@forms)
-	   (setq ialign--start (point-min)
+	   (setq ialign--beg (point-min)
 		 ialign--end (point-max)))))))
 
 (defun ialign--active-p ()
@@ -146,7 +146,7 @@ The buffer is narrowed to region that is to be aligned."
 (defun ialign--revert ()
   "Revert the aligned region to original `ialign--region-contents'."
   (ialign--with-region-narrowed
-   (delete-region ialign--start ialign--end)
+   (delete-region ialign--beg ialign--end)
    (insert ialign--region-contents)))
 
 (defun ialign--enable-tabs-p ()
@@ -433,7 +433,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
   (if (ialign--active-p)
       (error "Already aligning")
     (let* ((ialign--buffer (current-buffer))
-	   (ialign--start beg)
+	   (ialign--beg beg)
 	   (ialign--end end)
 	   (ialign--recursive-minibuffer nil)
 	   (region-contents (buffer-substring beg end))
@@ -466,7 +466,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 		  (unless (ialign--autoupdate-p)
 		    (ialign--align))
 		  (push (list 'apply #'ialign--undo
-			      ialign--start
+			      ialign--beg
 			      ialign--end
 			      region-contents)
 			buffer-undo-list))
