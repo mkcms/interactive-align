@@ -194,7 +194,8 @@ help"))))
   "Revert the current region, then align it."
   (ialign--revert)
   (ialign--with-region-narrowed
-   (let ((case-fold-search ialign--case-fold-search))
+   (let ((case-fold-search ialign--case-fold-search)
+	 (indent-tabs-mode (ialign--enable-tabs-p)))
      (align-regexp (point-min) (point-max) ialign--regexp
 		   ialign--group ialign--spacing ialign--repeat))))
 
@@ -364,8 +365,7 @@ Use `ialign-commit' to actually align the region in the buffer."
 	  (ialign--update-minibuffer-prompt)
 	  (when (or (called-interactively-p 'interactive)
 		    (ialign--autoupdate-p))
-	    (let ((regexp (minibuffer-contents-no-properties))
-		  (indent-tabs-mode (ialign--enable-tabs-p)))
+	    (let ((regexp (minibuffer-contents-no-properties)))
 	      (setq ialign--regexp regexp)
 	      (ialign--align)
 	      (redisplay))))
