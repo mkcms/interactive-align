@@ -1,13 +1,13 @@
 ;;; ialign.el --- visual align-regexp
 
 ;;
-;; Author: Michał Kondraciuk <k.michal@zoho.com>
+;; Author: Michał Krzywkowski <k.michal@zoho.com>
 ;; URL: https://github.com/mkcms/interactive-align
 ;; Package-Requires: ((emacs "24.4"))
 ;; Version: 0.4.2
 ;; Keywords: tools, editing, align, interactive
 
-;; Copyright (C) 2017 Michał Kondraciuk
+;; Copyright (C) 2017 Michał Krzywkowski
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
