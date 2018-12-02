@@ -101,6 +101,20 @@ or equal to this, otherwise do not update."
   :group 'ialign
   :type 'boolean)
 
+(defcustom ialign-implicit-regexp nil
+  "String to prepend to the regexp, if the regexp doesn't have a subgroup.
+
+`align-regexp' expects the align regexp to contain a
+parenthesized subexpression whose characters are replaced.
+However, it adds such an expression automatically to the regexp
+if necessary.  This option allows you to specify the string to
+implicitly prepend to the string in case there's no group
+subexpression."
+  :group 'ialign
+  :type '(choice (const :tag "Don't add implicit group" nil)
+                 (const :tag "Whitespace" "\\(\\s-*\\)")
+                 string))
+
 (defvaralias 'ialign-initial-spacing 'ialign-default-spacing)
 
 (defvar ialign--buffer nil)
@@ -193,11 +207,19 @@ help"))))
 (defun ialign--align ()
   "Revert the current region, then align it."
   (ialign--revert)
-  (ialign--with-region-narrowed
-   (let ((case-fold-search ialign--case-fold-search)
-	 (indent-tabs-mode (ialign--enable-tabs-p)))
-     (align-regexp (point-min) (point-max) ialign--regexp
-		   ialign--group ialign--spacing ialign--repeat))))
+  (let ((reg ialign--regexp))
+    (when (and (null (string-match-p (regexp-quote "\\(") reg))
+               (stringp ialign-implicit-regexp)
+               (= 1 ialign--group))
+      (setq reg (concat ialign-implicit-regexp reg))
+      (setq ialign--error "Using implicit regexp")
+      (when (minibufferp)
+        (ialign--update-minibuffer-prompt)))
+    (ialign--with-region-narrowed
+     (let ((case-fold-search ialign--case-fold-search)
+           (indent-tabs-mode (ialign--enable-tabs-p)))
+       (align-regexp (point-min) (point-max) reg
+                     ialign--group ialign--spacing ialign--repeat)))))
 
 (defun ialign--undo (beg end orig)
   "Delete region BEG END and insert ORIG at BEG.

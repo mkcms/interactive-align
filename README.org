@@ -131,6 +131,13 @@
    Default state of ~repeat~ argument passed to ~align-regexp~.
 
    The default value is ~nil~.
+** ~ialign-implicit-regexp~
+   String to prepend to the regexp, if the regex doesn't have a subgroup.
+   
+   Set this to ~\\(\\s-*\\)~ to implicitly prepend that string to
+   the regexp, if the regexp doesn't contain a subgroup expression.
+
+   The default value is ~nil~.
 * License
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
