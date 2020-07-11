@@ -29,6 +29,9 @@
 (global-set-key (kbd "C-x l") #'ialign)
    #+END_SRC
    You can also bind it to different key (~(kbd "your-key")~).
+** Additional packages
+   If you have an optional package - [[https://github.com/joddie/pcre2el][pcre2el]] - installed, you can use
+   PCRE regexps for alignment.
 * Usage
   To use it, mark a region and then call ~ialign~.
   You can enter a regexp in the minibuffer that will be passed to ~align-regexp~ command.
@@ -59,6 +62,10 @@
    Toggle tab usage during alignment.
 ** ~(ialign-toggle-case-fold)~
    Toggle case-fold searching on or off.
+** ~(ialign-toggle-pcre-mode)~
+   Toggle PCRE input mode.  With that, the input is treated as a PCRE
+   regexp, and is implicitly converted to elisp regexp implicitly
+   during alignment.  This requires the [[https://github.com/joddie/pcre2el][pcre2el]] library.
 ** ~(ialign-set-group GROUP)~
    Set the parenthesis group argument for the ~align-regexp~ command to /GROUP/.
 
@@ -88,6 +95,7 @@
    | C-c C-r | ialign-toggle-repeat     |
    | C-c C-t | ialign-toggle-tabs       |
    | C-c M-c | ialign-toggle-case-fold  |
+   | C-c C-p | ialign-toggle-pcre-mode  |
    | C-c +   | ialign-increment-spacing |
    | C-c -   | ialign-decrement-spacing |
    | C-c [   | ialign-decrement-group   |
@@ -138,6 +146,9 @@
    the regexp, if the regexp doesn't contain a subgroup expression.
 
    The default value is ~nil~.
+** ~ialign-pcre-mode~
+   If non-nil, enable PCRE mode when calling ~ialign~, as if by
+   calling ~ialign-toggle-pcre-mode~.
 * License
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

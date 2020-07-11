@@ -44,6 +44,7 @@
     (define-key map (kbd "C-c C-r") #'ialign-toggle-repeat)
     (define-key map (kbd "C-c C-t") #'ialign-toggle-tabs)
     (define-key map (kbd "C-c M-c") #'ialign-toggle-case-fold)
+    (define-key map (kbd "C-c C-p") #'ialign-toggle-pcre-mode)
     (define-key map (kbd "C-c +") #'ialign-increment-spacing)
     (define-key map (kbd "C-c -") #'ialign-decrement-spacing)
     (define-key map (kbd "C-c [") #'ialign-decrement-group)
@@ -115,6 +116,13 @@ subexpression."
                  (const :tag "Whitespace" "\\(\\s-*\\)")
                  string))
 
+(defcustom ialign-pcre-mode nil
+  "Treat input as PCRE regexp.
+This requires the `pcre2el' library.  You can still toggle PCRE
+mode during alignment with `ialign-toggle-pcre-mode'."
+  :group 'ialign
+  :type 'boolean)
+
 (defvaralias 'ialign-initial-spacing 'ialign-default-spacing)
 
 (defvar ialign--buffer nil)
@@ -126,6 +134,7 @@ subexpression."
 (defvar ialign--spacing nil)
 (defvar ialign--repeat nil)
 (defvar ialign--regexp nil)
+(defvar ialign--pcre-mode nil)
 (defvar ialign--history nil)
 (defvar ialign--error nil)
 (defvar ialign--case-fold-search nil)
@@ -181,12 +190,17 @@ The buffer is narrowed to region that is to be aligned."
 	   ialign-auto-update))
     ialign-auto-update))
 
+(defun ialign--pcre-supported-p ()
+  "Check if `pcre2el' library is present."
+  (ignore-errors (require 'pcre2el) t))
+
 (defun ialign--update-minibuffer-prompt ()
   "Update the minibuffer prompt to show arguments passed to `align-regexp'."
   (let ((inhibit-read-only t)
 	(prompt
-	 (format "Align regexp %s(group %s%s, spacing %s%s%s, %s): "
-		 (if (ialign--autoupdate-p) "" "(manual) ") ialign--group
+	 (format "Align regexp %s%s(group %s%s, spacing %s%s%s, %s): "
+		 (if ialign--pcre-mode "[PCRE] " "")
+                 (if (ialign--autoupdate-p) "" "(manual) ") ialign--group
 		 (if (< ialign--group 0) " (justify)" "") ialign--spacing
 		 (if ialign--repeat ", repeat" "")
 		 (if (ialign--enable-tabs-p) ", with tabs" "")
@@ -208,6 +222,9 @@ help"))))
   "Revert the current region, then align it."
   (ialign--revert)
   (let ((reg ialign--regexp))
+    (when ialign--pcre-mode
+      (require 'pcre2el)
+      (setq reg (rxt-pcre-to-elisp reg)))
     (when (and (null (string-match-p (regexp-quote "\\(") reg))
                (stringp ialign-implicit-regexp)
                (= 1 ialign--group))
@@ -251,7 +268,8 @@ This function is used to undo changes made by command `ialign'."
 	     minibuffer-text-before-history))))
       (setq ialign--group (nth 0 props)
  	    ialign--spacing (nth 1 props)
-	    ialign--repeat (nth 2 props))
+	    ialign--repeat (nth 2 props)
+	    ialign--pcre-mode (nth 3 props))
       (remove-list-of-text-properties
        (minibuffer-prompt-end) (point-max) '(ialign)))))
 
@@ -260,7 +278,10 @@ This function is used to undo changes made by command `ialign'."
 These properties are restored with `ialign--restore-arguments'"
   (propertize ialign--regexp
 	      'ialign
-	      (list ialign--group ialign--spacing ialign--repeat)))
+	      (list ialign--group
+                    ialign--spacing
+                    ialign--repeat
+                    ialign--pcre-mode)))
 
 (defun ialign--after-change (beg end len)
   "Function called after change.
@@ -280,6 +301,16 @@ Updates the minibuffer prompt and maybe realigns the region."
     (ialign-update 'quietly)
     (minibuffer-message
      (if ialign--case-fold-search "case insensitive" "case sensitive"))))
+
+(defun ialign-toggle-pcre-mode ()
+  "Toggle PCRE mode regexps.
+This requires the `pcre2el' library."
+  (interactive)
+  (when (ialign--active-p)
+    (if (ialign--pcre-supported-p)
+        (setq ialign--pcre-mode (not ialign--pcre-mode))
+      (error "Cannot enable PCRE mode: `pcre2el' library is not installed"))
+    (ialign-update)))
 
 (defun ialign-toggle-repeat ()
   "Toggle 'repeat' argument passed to `align-regexp'.
@@ -419,6 +450,7 @@ decrement spacing
 \\[ialign-toggle-repeat]: repeat the alignment throughout the line (toggle)
 \\[ialign-toggle-tabs]: toggle tab usage
 \\[ialign-toggle-case-fold]: toggle case fold searching
+\\[ialign-toggle-pcre-mode]: toggle PCRE mode - treat input as a PCRE regexp.
 \\[next-history-element], \\[previous-history-element]: next/previous history \
 element
 \\[ialign-commit]: commit the alignment in buffer"))))
@@ -460,6 +492,7 @@ The keymap used in minibuffer is `ialign-minibuffer-keymap':
 	   (ialign--recursive-minibuffer nil)
 	   (region-contents (buffer-substring beg end))
 	   (ialign--region-contents region-contents)
+	   (ialign--pcre-mode (and ialign-pcre-mode (ialign--pcre-supported-p)))
 	   (ialign--repeat repeat)
 	   (ialign--group group)
 	   (ialign--spacing spacing)
