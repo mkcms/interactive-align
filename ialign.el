@@ -71,7 +71,7 @@
   "A value that says when the region should be aligned with tabs.
 If it's nil, never use tabs.
 If it's t, always use tabs.
-If it's the symbol 'indent-tabs-mode, use value of variable
+If it's the symbol \\='indent-tabs-mode, use value of variable
 `indent-tabs-mode'."
   :group 'ialign
   :type '(choice (const :tag "Never use tabs" nil)
@@ -310,7 +310,7 @@ This requires the `pcre2el' library."
     (ialign-update)))
 
 (defun ialign-toggle-repeat ()
-  "Toggle 'repeat' argument passed to `align-regexp'.
+  "Toggle \\='repeat\\=' argument passed to `align-regexp'.
 When the repeat argument is non-nil, the alignment is repeated throughout
 the line.
 Does nothing when currently not aligning with `ialign'."
