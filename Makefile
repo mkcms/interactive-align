@@ -9,6 +9,15 @@ compile: $(ELC)
 %.elc: %.el
 	${emacs} ${ARGS} -L . -f batch-byte-compile $<
 
+lint:
+	file=$$(mktemp)                                                       \
+	&& ${emacs} -Q --batch ialign.el                                      \
+		--eval '(checkdoc-file (buffer-file-name))' 2>&1 | tee $$file \
+	&& test -z "$$(cat $$file)"                                           \
+	&& (grep -n -E "^.{80,}" ialign.el `# Catch long lines`               \
+	    | sed                                                             \
+		-r 's/^([0-9]+).*/ialign.el:\1: Too long/;q1')
+
 update-copyright-years:
 	year=`date +%Y`;                                                      \
 	sed -i *.el *.org -r                                                  \

@@ -37,7 +37,7 @@
 (require 'pcre2el nil 'noerror)
 
 (defgroup ialign nil
-  "Interactive align-regexp."
+  "Interactive `align-regexp'."
   :group 'align)
 
 (defcustom ialign-minibuffer-keymap
@@ -281,7 +281,7 @@ These properties are restored with `ialign--restore-arguments'"
                     ialign--pcre-mode)))
 
 (defun ialign--after-change (beg end len)
-  "Function called after change.
+  "Function called after change using BEG END LEN.
 Updates the minibuffer prompt and maybe realigns the region."
   (when (and (ialign--active-p) (minibufferp)
 	     (not ialign--recursive-minibuffer))

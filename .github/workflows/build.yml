@@ -32,3 +32,6 @@ jobs:
 
       - name: Compile
         run: make compile
+
+      - name: Lint
+        run: make lint
