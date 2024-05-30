@@ -7,7 +7,9 @@ ARGS := --batch -Q
 compile: $(ELC)
 
 %.elc: %.el
-	${emacs} ${ARGS} -L . -f batch-byte-compile $<
+	${emacs} ${ARGS} -L .                                                 \
+		--eval '(setq byte-compile-error-on-warn t)'                  \
+	 -f batch-byte-compile $<
 
 lint:
 	file=$$(mktemp)                                                       \
