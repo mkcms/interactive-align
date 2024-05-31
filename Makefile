@@ -11,6 +11,10 @@ compile: $(ELC)
 		--eval '(setq byte-compile-error-on-warn t)'                  \
 	 -f batch-byte-compile $<
 
+# Run emacs -Q with packages installed and ialign loaded
+_baremacs: ${ELC}
+	${emacs} -Q -L . -l ialign
+
 lint:
 	file=$$(mktemp)                                                       \
 	&& ${emacs} -Q --batch ialign.el                                      \
