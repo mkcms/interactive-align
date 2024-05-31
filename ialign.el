@@ -1,4 +1,4 @@
-;;; ialign.el --- visual align-regexp
+;;; ialign.el --- visual align-regexp  -*- lexical-binding: t; -*-
 
 ;;
 ;; Author: Michał Krzywkowski <k.michal@zoho.com>
@@ -280,8 +280,8 @@ These properties are restored with `ialign--restore-arguments'"
                     ialign--repeat
                     ialign--pcre-mode)))
 
-(defun ialign--after-change (beg end len)
-  "Function called after change using BEG END LEN.
+(defun ialign--after-change (_beg _end _len)
+  "Function called after change using.
 Updates the minibuffer prompt and maybe realigns the region."
   (when (and (ialign--active-p) (minibufferp)
 	     (not ialign--recursive-minibuffer))
@@ -451,6 +451,8 @@ decrement spacing
 \\[next-history-element], \\[previous-history-element]: next/previous history \
 element
 \\[ialign-commit]: commit the alignment in buffer"))))
+
+(defvar ialign-initial-spacing)
 
 ;;;###autoload
 (defun ialign (beg end &optional regexp group spacing repeat)
